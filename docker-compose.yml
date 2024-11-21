@@ -1,0 +1,39 @@
+services:
+  
+  cassandra:
+    image: cassandra:4.0 # Cassandra database image version 4.0
+    container_name: cassandra_db
+    ports:
+      - "9042:9042" # Expose Cassandra's default port for communication with backend service
+    environment:
+      - CASSANDRA_CLUSTER_NAME=chat-cluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_RACK=rack1
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  # backend:
+  #   build: ./ChatAppBackend # Build the backend from its Dockerfile in ./ChatAppBackend directory
+  #   container_name: dotnet_chat_backend
+  #   ports:
+  #     - "8000:80" # Expose port 5000 for HTTP traffic (backend API)
+  #     - "8001:443" # Expose port 5001 for HTTPS traffic (optional)
+  #   environment:
+      # - ASPNETCORE_ENVIRONMENT=Development # Set environment to Development mode for backend service.
+      # - CASSANDRA_HOST=cassandra_db # Hostname of Cassandra service in this network.
+      # - CASSANDRA_PORT=9042 # Cassandra port where it listens for requests.
+      # - CASSANDRA_KEYSPACE=chatapp # Keyspace name in Cassandra.
+  #   depends_on:
+  #     - cassandra # Ensure Cassandra starts before backend service.
+
+  # frontend:
+  #   build: ./chat-app-frontend # Build the frontend from its Dockerfile in ./chat-app-frontend directory.
+  #   container_name: react_chat_frontend
+  #   ports:
+  #     - "3000:80" # Expose port 3000 to serve the React app via Nginx.
+  #   environment:
+  #     - REACT_APP_BACKEND_URL=http://localhost:8000/api/ # Backend URL for frontend to communicate with.
+  #     - REACT_APP_CHAT_WS_URL=ws://localhost:8000/api/chat/ws # WebSocket URL for frontend to communicate with.
+
+volumes:
+  cassandra_data:
