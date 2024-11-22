@@ -10,18 +10,22 @@ namespace ChatAppBackend.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
-        private readonly WebSockets.WebSocketManager _webSocketManager;
+        private readonly ChatWebSocketManager _webSocketManager;
+        private readonly IChatAccessService _accessControlService;
 
-        public ChatController(IChatService chatService, WebSockets.WebSocketManager webSocketManager)
+        public ChatController(
+            IChatService chatService,
+            ChatWebSocketManager webSocketManager,
+            IChatAccessService accessControlService)
         {
             _chatService = chatService;
             _webSocketManager = webSocketManager;
+            _accessControlService = accessControlService;
         }
 
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
         {
-            
             await _chatService.SendMessageAsync(message);
             return Ok();
         }
@@ -34,17 +38,28 @@ namespace ChatAppBackend.Controllers
         }
 
         [HttpGet("ws")]
-        public async Task GetWebSocket()
+        public async Task GetWebSocket(Guid userId, Guid chatId)
         {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
+            if (!HttpContext.WebSockets.IsWebSocketRequest)
             {
-                var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await _webSocketManager.AddWebSocketAsync(webSocket);
+                HttpContext.Response.StatusCode = 400; // Bad Request
+                return;
             }
-            else
+
+            // Perform access check
+            var hasAccess = await _accessControlService.HasAccessAsync(userId, chatId);
+            if (!hasAccess)
             {
-                HttpContext.Response.StatusCode = 400;
+                HttpContext.Response.StatusCode = 403; // Forbidden
+                return;
             }
-        }       
+
+            // Accept WebSocket connection
+            var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+
+            // Add WebSocket to manager with context (UserId and ChatId)
+            var chatContext = new ChatContext(userId, chatId);
+            await _webSocketManager.AddWebSocketAsync(webSocket, chatContext);
+        }
     }
 }

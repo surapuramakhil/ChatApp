@@ -6,9 +6,9 @@ namespace ChatAppBackend.Services
     public class ChatService : IChatService
     {
         private readonly IChatRepository _repository;
-        private readonly WebSockets.WebSocketManager _webSocketManager;
+        private readonly WebSockets.ChatWebSocketManager _webSocketManager;
 
-        public ChatService(IChatRepository repository, WebSockets.WebSocketManager webSocketManager)
+        public ChatService(IChatRepository repository, WebSockets.ChatWebSocketManager webSocketManager)
         {
             _repository = repository;
             _webSocketManager = webSocketManager;

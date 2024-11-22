@@ -4,11 +4,10 @@ import axios from 'axios';
 function App() {
     const [messages, setMessages] = useState([]);
     const [messageBody, setMessageBody] = useState('');
-    const [chatId] = useState('f47ac10b-58cc-4372-a567-0e02b2c3d479'); // Hardcoded UUID for simplicity
-    const [error, setError] = useState(null); // State for tracking errors
+    const [chatId] = useState('f47ac10b-58cc-4372-a567-0e02b2c3d479'); // Hardcoded ChatId
+    const [userId] = useState('3f2504e0-4f89-11d3-9a0c-0305e82c3301'); // Hardcoded UserId
+    const [error, setError] = useState(null);
     const wsRef = useRef(null); // UseRef to persist WebSocket instance across renders
-
-    
 
     // Fetch last 50 messages on component mount and initialize WebSocket
     useEffect(() => {
@@ -32,7 +31,7 @@ function App() {
                 console.log('WebSocket connection closed on cleanup.');
             }
         };
-    },[]); // Empty dependency array ensures this runs only once on mount
+    }, []); // Empty dependency array ensures this runs only once on mount
 
     // Log messages when updated
     useEffect(() => {
@@ -54,14 +53,15 @@ function App() {
 
     const connectWebSocket = () => {
         try {
-            const wsUrl = process.env.REACT_APP_CHAT_WS_URL || 'ws://localhost:5000/api/chat/ws';
+            // Append UserId and ChatId as query parameters in WebSocket URL
+            const wsUrl = `${process.env.REACT_APP_CHAT_WS_URL || 'ws://localhost:5000/api/chat/ws'}?userId=${userId}&chatId=${chatId}`;
+            console.log('WebSocket URL:', wsUrl);
             wsRef.current = new WebSocket(wsUrl);
 
             wsRef.current.onopen = () => console.log('WebSocket connection established.');
 
             wsRef.current.onmessage = (event) => {
                 try {
-                    
                     console.log('WebSocket message received:', event.data);
                     const newMessage = JSON.parse(event.data); // Assuming the message is JSON
                     console.log('Parsed WebSocket message:', newMessage);
@@ -76,7 +76,13 @@ function App() {
                 setError('WebSocket connection error. Please refresh the page.');
             };
 
-            wsRef.current.onclose = () => console.log('WebSocket connection closed.');
+            wsRef.current.onclose = (event) => {
+                if (event.code === 403) { // Handle access denial
+                    setError('Access denied. You do not have permission to join this chat.');
+                } else {
+                    console.log('WebSocket connection closed.');
+                }
+            };
         } catch (err) {
             console.error('Error connecting to WebSocket:', err);
             setError('Failed to connect to WebSocket. Please check your connection.');
@@ -92,7 +98,7 @@ function App() {
         try {
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/chat/send`, {
                 chatId,
-                senderId: '3f2504e0-4f89-11d3-9a0c-0305e82c3301', // Hardcoded for simplicity
+                senderId: userId,
                 body: messageBody,
             });
             setMessageBody('');

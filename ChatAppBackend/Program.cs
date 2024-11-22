@@ -19,17 +19,25 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // Register WebSocketManager as a service
-builder.Services.AddSingleton<ChatAppBackend.WebSockets.WebSocketManager>();
+builder.Services.AddSingleton<ChatAppBackend.WebSockets.ChatWebSocketManager>();
 
 // Configure Cassandra connection
 var cassandraSession = CreateCassandraSession(builder.Configuration);
 
-// Add custom services
-builder.Services.AddScoped<IChatService, ChatService>();
+// Register repositories
 builder.Services.AddScoped<IChatRepository>(provider =>
 {
     return new CassandraChatRepository(cassandraSession);
 });
+builder.Services.AddScoped<IChatAccessRepository>(
+    provider => {
+        return new CassandraChatAccessRepository(cassandraSession);
+    }
+);
+
+// Add custom services
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IChatAccessService, ChatAccessService>();
 
 var app = builder.Build();
 
