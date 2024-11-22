@@ -1,0 +1,20 @@
+services:
+  cassandra:
+    image: cassandra:5.0
+    container_name: cassandra_db
+    ports:
+      - "9042:9042" # Expose Cassandra's default port for communication with backend service
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe keyspaces'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - CASSANDRA_CLUSTER_NAME=chat-cluster
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_RACK=rack1
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+volumes:
+  cassandra_data:

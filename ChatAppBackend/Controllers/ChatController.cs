@@ -21,6 +21,7 @@ namespace ChatAppBackend.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
         {
+            
             await _chatService.SendMessageAsync(message);
             return Ok();
         }

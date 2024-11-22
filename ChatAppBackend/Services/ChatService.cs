@@ -6,15 +6,19 @@ namespace ChatAppBackend.Services
     public class ChatService : IChatService
     {
         private readonly ICassandraRepository _repository;
+        private readonly WebSockets.WebSocketManager _webSocketManager;
 
-        public ChatService(ICassandraRepository repository)
+        public ChatService(ICassandraRepository repository, WebSockets.WebSocketManager webSocketManager)
         {
             _repository = repository;
+            _webSocketManager = webSocketManager;
         }
 
         public async Task SendMessageAsync(ChatMessage message)
         {
+            Console.WriteLine($"Sending message: {message.Body}");
             await _repository.InsertMessage(message);
+            await _webSocketManager.SendMessageToAllAsync(message);
         }
 
         public async Task<IEnumerable<ChatMessage>> GetLastMessagesAsync(Guid chatId)

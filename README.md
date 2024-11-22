@@ -56,48 +56,8 @@ Despite these drawbacks, the benefits of using Cassandra for high-performance, s
 
 as there is limited support on EF code - Evolve has added for migrations
 
-### Database Migrations with Evolve
-
-To manage database schema changes, we use the Evolve database migration tool. Evolve is a lightweight migration tool that helps to evolve your database schema, keeping it synchronized with your application model.
-
-#### Setting Up Evolve
-
-1. **Install Evolve**:
-    Add the Evolve dependency to your project. For .NET projects, you can install it via NuGet:
-    ```bash
-    dotnet add package Evolve
-    ```
-
-2. **Configuration**:
-    Configure Evolve in your `appsettings.json` or environment variables:
-    ```json
-    {
-         "Evolve": {
-              "Locations": "db/migrations",
-              "Command": "migrate",
-              "ConnectionString": "Server=cassandra_db;Port=9042;Keyspace=chatapp",
-              "Driver": "Cassandra"
-         }
-    }
-    ```
-
-3. **Create Migration Scripts**:
-    Place your migration scripts in the specified `Locations` directory (e.g., `db/migrations`). Each script should be named sequentially (e.g., `V1__Create_table.sql`).
-
-4. **Run Migrations**:
-    Execute Evolve migrations as part of your application startup or as a separate step in your deployment pipeline:
-    ```csharp
-    var evolve = new Evolve.Evolve("ConnectionString", msg => Console.WriteLine(msg))
-    {
-         Locations = new[] { "db/migrations" },
-         IsEraseDisabled = true
-    };
-    evolve.Migrate();
-    ```
-
-Using Evolve ensures that your Cassandra database schema is always up-to-date with the latest changes, reducing the risk of inconsistencies and simplifying the deployment process.
-
----
+### Database Migrations with Flyway
+<!-- TODO: finish this section -->
 
 ---
 

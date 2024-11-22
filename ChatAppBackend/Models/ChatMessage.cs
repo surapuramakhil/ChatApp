@@ -4,7 +4,7 @@ namespace ChatAppBackend.Models
     {
         public Guid ChatId { get; set; }
         public Guid SenderId { get; set; }
-        public string? Body { get; set; }
+        public required string Body { get; set; }
         public DateTime Timestamp { get; set; }
     }
 }
