@@ -18,7 +18,7 @@ namespace ChatAppBackend.Services
         {
             Console.WriteLine($"Sending message: {message.Body}");
             await _repository.InsertMessage(message);
-            await _webSocketManager.SendMessageToAllAsync(message);
+            await _webSocketManager.BroadcastMessageAsync(message);
         }
 
         public async Task<IEnumerable<ChatMessage>> GetLastMessagesAsync(Guid chatId)

@@ -58,7 +58,7 @@ namespace ChatAppBackend.WebSockets
             }
         }
 
-        public async Task SendMessageToAllAsync(ChatMessage message)
+        public async Task BroadcastMessageAsync(ChatMessage message)
         {
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             
@@ -70,12 +70,18 @@ namespace ChatAppBackend.WebSockets
 
             foreach (var (socket, _) in _socketContexts)
             {
-                if (socket.State == WebSocketState.Open)
+                if (socket.State == WebSocketState.Open && IsRelevantSocket(socket, message))
                 {
                     await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
         }
+
+        private bool IsRelevantSocket(WebSocket socket, ChatMessage message)
+        {
+            return _socketContexts.ContainsKey(socket) && _socketContexts[socket].ChatId == message.ChatId;
+        }
+
     }
 
     public class ChatContext
