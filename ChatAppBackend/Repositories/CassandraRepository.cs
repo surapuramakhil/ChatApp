@@ -3,11 +3,11 @@ using ChatAppBackend.Models;
 
 namespace ChatAppBackend.Repositories
 {
-    public class CassandraRepository : ICassandraRepository
+    public class CassandraChatRepository : IChatRepository
     {
         private readonly Cassandra.ISession _session;
 
-        public CassandraRepository(Cassandra.ISession session)
+        public CassandraChatRepository(Cassandra.ISession session)
         {
             _session = session;
         }

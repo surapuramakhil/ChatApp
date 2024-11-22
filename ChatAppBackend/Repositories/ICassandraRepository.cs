@@ -2,7 +2,7 @@ using ChatAppBackend.Models;
 
 namespace ChatAppBackend.Repositories
 {
-    public interface ICassandraRepository
+    public interface IChatRepository
     {
         Task InsertMessage(ChatMessage message);
         Task<IEnumerable<ChatMessage>> GetLastMessages(Guid chatId, int limit);

@@ -26,9 +26,9 @@ var cassandraSession = CreateCassandraSession(builder.Configuration);
 
 // Add custom services
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<ICassandraRepository>(provider =>
+builder.Services.AddScoped<IChatRepository>(provider =>
 {
-    return new CassandraRepository(cassandraSession);
+    return new CassandraChatRepository(cassandraSession);
 });
 
 var app = builder.Build();
