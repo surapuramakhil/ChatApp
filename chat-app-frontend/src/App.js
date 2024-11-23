@@ -44,7 +44,11 @@ function App() {
 
     const fetchLastMessages = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/chat/${chatId}/messages`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/chat/${chatId}/messages`, {
+                params: {
+                    userId: userId
+                }
+            });
             setMessages(response.data.reverse());
         } catch (err) {
             console.error('Error fetching messages:', err);

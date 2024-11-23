@@ -26,13 +26,23 @@ namespace ChatAppBackend.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
         {
+            var hasAccess = await _accessControlService.HasAccessAsync(message.SenderId, message.ChatId);
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
             await _chatService.SendMessageAsync(message);
             return Ok();
         }
 
         [HttpGet("{chatId}/messages")]
-        public async Task<IActionResult> GetLastMessages(Guid chatId)
+        public async Task<IActionResult> GetLastMessages(Guid chatId, Guid userId)
         {
+            var hasAccess = await _accessControlService.HasAccessAsync(userId, chatId);
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
             var messages = await _chatService.GetLastMessagesAsync(chatId);
             return Ok(messages);
         }
